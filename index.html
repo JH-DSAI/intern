@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tools for Software Engineering — JHU DSAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF9;
+  --surface:#FFFFFF;
+  --ink:#17171B;
+  --muted:#6B6B73;
+  --faint:#9A9AA2;
+  --line:#E8E6E2;
+  --line-strong:#D8D5CF;
+  --accent:#4338CA;        /* indigo */
+  --accent-soft:#EEF0FE;
+  --accent-ink:#3730A3;
+  --warm:#E0603A;          /* clay/coral highlight */
+  --warm-soft:#FCEFE9;
+  --teal:#0E8E86;
+  --teal-soft:#E2F4F1;
+  --gold:#B8860B;
+  --shadow:0 1px 2px rgba(20,20,30,.04), 0 8px 30px rgba(20,20,30,.06);
+  --shadow-lg:0 2px 4px rgba(20,20,30,.05), 0 24px 60px rgba(20,20,30,.10);
+  --r:18px;
+  --maxw:1080px;
+  --ease:cubic-bezier(.22,.7,.18,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.serif{font-family:"Fraunces",Georgia,serif}
+
+/* ---------- Deck / slides ---------- */
+#deck{position:relative;width:100vw;height:100vh;overflow:hidden}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(28px,5.5vw,96px);
+  padding-bottom:clamp(48px,7vw,110px);
+  opacity:0;visibility:hidden;
+  transform:translateY(22px) scale(.992);
+  transition:opacity .55s var(--ease), transform .55s var(--ease), visibility .55s;
+  overflow:hidden;
+}
+.slide.is-active{opacity:1;visibility:visible;transform:none;z-index:2}
+.slide.is-past{transform:translateY(-22px) scale(.992)}
+.slide__inner{width:100%;max-width:var(--maxw);margin:0 auto}
+.slide.center .slide__inner{text-align:center}
+
+/* ---------- Build-in animation ---------- */
+[data-anim]{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease), transform .6s var(--ease)}
+.slide.is-active [data-anim]{opacity:1;transform:none}
+
+/* ---------- Typography ---------- */
+.kicker{
+  display:inline-flex;align-items:center;gap:.5em;
+  font-size:clamp(11px,1vw,13px);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);
+}
+.kicker::before{content:"";width:26px;height:2px;background:var(--accent);border-radius:2px;display:inline-block}
+.slide.center .kicker::before{display:none}
+h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(38px,6.6vw,82px);line-height:1.02;letter-spacing:-.02em}
+h2{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(28px,4.4vw,52px);line-height:1.06;letter-spacing:-.015em;margin:.32em 0 .55em}
+.lead{font-size:clamp(15px,1.7vw,21px);color:var(--muted);line-height:1.55;max-width:62ch}
+.slide.center .lead{margin-left:auto;margin-right:auto}
+p{line-height:1.55}
+strong{font-weight:600;color:var(--ink)}
+.hl{background:linear-gradient(180deg,transparent 62%,var(--warm-soft) 62%);padding:0 .08em;color:var(--ink);font-weight:600}
+.ink-accent{color:var(--accent)}
+.ink-warm{color:var(--warm)}
+
+/* ---------- Chrome (progress, dots, counter) ---------- */
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:transparent;z-index:50}
+.progress__bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--warm));transition:width .45s var(--ease)}
+.counter{position:fixed;left:clamp(20px,3vw,40px);bottom:clamp(18px,2.6vw,34px);z-index:40;font-size:13px;color:var(--faint);font-weight:500;letter-spacing:.04em}
+.counter b{color:var(--ink);font-weight:600}
+.brand{position:fixed;right:clamp(20px,3vw,40px);bottom:clamp(18px,2.6vw,34px);z-index:40;font-size:12px;color:var(--faint);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--warm)}
+.dots{position:fixed;right:clamp(14px,1.8vw,26px);top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:11px}
+.dots button{position:relative;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line-strong);background:transparent;cursor:pointer;padding:0;transition:all .3s var(--ease)}
+.dots button:hover{border-color:var(--accent);transform:scale(1.25)}
+.dots button.active{background:var(--accent);border-color:var(--accent);transform:scale(1.15)}
+.dots button .tip{position:absolute;right:20px;top:50%;transform:translateY(-50%) translateX(6px);white-space:nowrap;background:var(--ink);color:#fff;font-size:11px;padding:5px 9px;border-radius:7px;opacity:0;pointer-events:none;transition:.22s var(--ease);font-weight:500;letter-spacing:.01em}
+.dots button:hover .tip{opacity:1;transform:translateY(-50%) translateX(0)}
+.hint{position:fixed;left:50%;bottom:clamp(16px,2.4vw,30px);transform:translateX(-50%);z-index:40;font-size:11.5px;color:var(--faint);letter-spacing:.05em;display:flex;gap:14px;align-items:center}
+.hint kbd{font-family:"JetBrains Mono",monospace;background:var(--surface);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:10.5px;color:var(--muted)}
+@media (max-width:760px){.dots,.hint{display:none}}
+
+/* ---------- Reusable building blocks ---------- */
+.grid{display:grid;gap:clamp(12px,1.6vw,20px)}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:860px){.cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}.cols-2{grid-template-columns:1fr}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(16px,1.9vw,26px);box-shadow:var(--shadow);transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.card h3{font-size:clamp(15px,1.5vw,19px);font-weight:600;margin-bottom:.35em;display:flex;align-items:center;gap:.5em;letter-spacing:-.01em}
+.card p{font-size:clamp(13px,1.25vw,15px);color:var(--muted);line-height:1.5}
+.card .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:17px;flex:none}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:30px}
+.tag.indigo{background:var(--accent-soft);color:var(--accent-ink)}
+.tag.warm{background:var(--warm-soft);color:#B8492A}
+.tag.teal{background:var(--teal-soft);color:#0B6B64}
+.tag.gray{background:#F0EFEC;color:var(--muted)}
+
+.bullet{display:flex;gap:14px;align-items:flex-start;margin:0}
+.bullet .n{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:14px;font-family:"JetBrains Mono",monospace}
+.bullet h3{font-size:clamp(15px,1.5vw,18px);font-weight:600;margin-bottom:.2em}
+.bullet p{font-size:clamp(13px,1.25vw,15px);color:var(--muted);line-height:1.5}
+
+/* terminal / window mock */
+.win{background:#1C1C22;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid #2A2A33}
+.win__bar{display:flex;align-items:center;gap:7px;padding:10px 13px;background:#26262E;border-bottom:1px solid #33333D}
+.win__bar i{width:11px;height:11px;border-radius:50%;display:block}
+.win__bar .t{margin-left:8px;font-size:11px;color:#9A9AA8;font-family:"JetBrains Mono",monospace}
+.win__body{padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.7;color:#D6D6E0}
+.win__body .pr{color:#7DD3C0}
+.win__body .cm{color:#8A8AA0}
+.win__body .ac{color:#C4B5FD}
+.win__body .ok{color:#86EFAC}
+
+/* request/response sample (OpenAI chat completions w/ tool calling) */
+.spec-cap{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:1.1em 0 .5em;display:flex;align-items:center;gap:8px}
+.spec-cap small{font-family:"JetBrains Mono",monospace;letter-spacing:0;text-transform:none;color:var(--faint);font-weight:500;font-size:11px}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spec-blk{background:#1C1C22;border-radius:11px;overflow:hidden;border:1px solid #2A2A33;box-shadow:var(--shadow-lg)}
+.spec-blk .h{display:flex;align-items:center;gap:7px;padding:7px 12px;background:#26262E;border-bottom:1px solid #33333D;font-size:10px;font-family:"JetBrains Mono",monospace;color:#9A9AA8;letter-spacing:.06em}
+.spec-blk .h i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.spec-blk .h .v{font-weight:700}
+.spec-blk .h.req .v{color:#C4B5FD}
+.spec-blk .h.res .v{color:#86EFAC}
+.spec-blk .h .ep{margin-left:auto;color:#6B7280;font-size:9.5px}
+.spec-blk pre{margin:0;padding:10px 13px;font-family:"JetBrains Mono",monospace;font-size:clamp(9.5px,.82vw,11.5px);line-height:1.55;color:#D6D6E0;white-space:pre;overflow:hidden;tab-size:2}
+.spec-blk pre .k{color:#9CB7FF}
+.spec-blk pre .s{color:#FBD38D}
+.spec-blk pre .n{color:#86EFAC}
+.spec-blk pre .nl{color:#FCA5A5}
+.spec-blk pre .c{color:#6B7280;font-style:italic}
+.spec-blk pre mark{background:rgba(196,181,253,.16);color:inherit;border-radius:3px;padding:0 2px}
+.spec-blk pre .hl{background:rgba(134,239,172,.14);border-radius:3px;padding:0 2px}
+@media (max-width:760px){.spec{grid-template-columns:1fr}}
+
+/* big formula */
+.formula{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:clamp(10px,1.4vw,22px);margin:clamp(18px,3vw,40px) 0}
+.fterm{font-family:"Fraunces",serif;font-size:clamp(30px,5vw,62px);font-weight:500;letter-spacing:-.02em;padding:clamp(10px,1.4vw,18px) clamp(16px,2vw,30px);border-radius:16px;line-height:1}
+.fterm.box{border:1.5px solid var(--line-strong);background:var(--surface);box-shadow:var(--shadow)}
+.fterm.model{color:var(--accent)}
+.fterm.harness{color:var(--warm);border-color:var(--warm)}
+.fop{font-family:"Fraunces",serif;font-size:clamp(26px,4vw,52px);color:var(--faint);font-weight:400}
+
+/* anatomy chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 15px;font-size:clamp(12.5px,1.2vw,15px);box-shadow:var(--shadow)}
+.chip .d{width:9px;height:9px;border-radius:3px;flex:none}
+
+/* react loop */
+.loop-wrap{display:flex;align-items:center;justify-content:center;gap:clamp(20px,4vw,70px);flex-wrap:wrap}
+.loop-svg{width:clamp(220px,30vw,330px);height:clamp(220px,30vw,330px);flex:none}
+.loop-legend{display:flex;flex-direction:column;gap:14px;max-width:330px}
+.loop-legend .li{display:flex;gap:12px;align-items:flex-start}
+.loop-legend .li b{display:block;font-size:15px}
+.loop-legend .li span{font-size:13.5px;color:var(--muted);line-height:1.45}
+.loop-legend .li .k{flex:none;width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px;font-family:"JetBrains Mono",monospace}
+
+/* timeline */
+.timeline{position:relative;margin-top:clamp(20px,3vw,46px);display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,30px)}
+.timeline::before{content:"";position:absolute;top:19px;left:6%;right:6%;height:2px;background:linear-gradient(90deg,var(--accent),var(--teal),var(--warm));border-radius:2px;z-index:0}
+.tl{position:relative;z-index:1;text-align:center}
+.tl .node{width:40px;height:40px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:var(--surface);border:2px solid var(--line-strong);font-weight:700;font-family:"JetBrains Mono",monospace;font-size:15px;box-shadow:var(--shadow)}
+.tl:nth-child(1) .node{border-color:var(--accent);color:var(--accent)}
+.tl:nth-child(2) .node{border-color:var(--teal);color:var(--teal)}
+.tl:nth-child(3) .node{border-color:var(--warm);color:var(--warm)}
+.tl h3{font-size:clamp(15px,1.6vw,20px);font-weight:600;margin-bottom:.25em}
+.tl .yr{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:.5em}
+.tl p{font-size:clamp(12.5px,1.2vw,14.5px);color:var(--muted);line-height:1.5}
+
+/* triangle */
+.tri-wrap{display:flex;align-items:center;justify-content:center;gap:clamp(22px,4vw,64px);flex-wrap:wrap}
+.tri-svg{width:clamp(260px,38vw,440px);height:clamp(220px,30vw,360px);flex:none}
+.tri-legend{display:flex;flex-direction:column;gap:16px;max-width:340px}
+.tri-legend .li{padding-left:16px;border-left:3px solid var(--line-strong)}
+.tri-legend .li.e1{border-color:var(--accent)}
+.tri-legend .li.e2{border-color:var(--teal)}
+.tri-legend .li.e3{border-color:var(--warm)}
+.tri-legend .li b{font-size:14.5px}
+.tri-legend .li code{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted)}
+.tri-legend .li p{font-size:13px;color:var(--muted);line-height:1.45;margin-top:3px}
+
+/* split layout */
+.split{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,3vw,48px);align-items:center}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+
+/* vs table */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,26px)}
+@media (max-width:760px){.vs{grid-template-columns:1fr}}
+.vs .panel{border-radius:var(--r);padding:clamp(18px,2vw,28px);border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
+.vs .panel.a{border-top:4px solid var(--accent)}
+.vs .panel.b{border-top:4px solid var(--warm)}
+.vs .panel h3{font-size:clamp(16px,1.7vw,21px);font-weight:600;margin-bottom:.5em}
+.vs .panel .sub{font-size:12.5px;color:var(--faint);margin-bottom:1em;font-family:"JetBrains Mono",monospace}
+.vs ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.vs li{font-size:clamp(13px,1.25vw,15px);color:var(--muted);line-height:1.45;padding-left:22px;position:relative}
+.vs li::before{content:"›";position:absolute;left:4px;color:var(--accent);font-weight:700}
+.vs .panel.b li::before{color:var(--warm)}
+
+/* feature list rows */
+.rows{display:flex;flex-direction:column;gap:11px}
+.row{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:start;padding:13px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .lab{display:flex;align-items:center;gap:9px;font-weight:600;font-size:clamp(14px,1.4vw,17px)}
+.row .lab .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;flex:none}
+.row .desc{font-size:clamp(13px,1.25vw,15px);color:var(--muted);line-height:1.5}
+.row .desc code{font-family:"JetBrains Mono",monospace;font-size:.88em;background:#F1F0ED;padding:1px 5px;border-radius:5px;color:var(--accent-ink)}
+@media (max-width:760px){.row{grid-template-columns:1fr;gap:4px}}
+
+/* quote */
+.quote{font-family:"Fraunces",serif;font-size:clamp(22px,3.2vw,40px);line-height:1.22;font-weight:400;letter-spacing:-.01em}
+.quote .mk{color:var(--warm)}
+.attrib{margin-top:1.2em;font-size:13px;color:var(--faint);letter-spacing:.04em}
+.attrib a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line-strong)}
+.attrib a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+
+/* prominent reference button */
+.refbtn{display:inline-flex;align-items:center;gap:14px;margin-top:1.3em;padding:14px 22px;background:linear-gradient(135deg,var(--accent),var(--accent-ink));color:#fff;border-radius:14px;text-decoration:none;border:1px solid rgba(255,255,255,.08);box-shadow:0 4px 18px rgba(67,56,202,.28), 0 1px 3px rgba(67,56,202,.14);transition:transform .25s var(--ease), box-shadow .3s var(--ease)}
+.refbtn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(67,56,202,.38), 0 2px 5px rgba(67,56,202,.18)}
+.refbtn .ic{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:16px;flex:none}
+.refbtn .col{display:flex;flex-direction:column;line-height:1.2}
+.refbtn .lbl{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.82}
+.refbtn .url{font-family:"JetBrains Mono",monospace;font-size:clamp(14px,1.4vw,16px);font-weight:600;margin-top:2px}
+.refbtn .arr{font-size:20px;opacity:.92;margin-left:auto;padding-left:6px}
+.slide.is-active .refbtn{animation:refpulse 2.2s var(--ease) .8s 2}
+@keyframes refpulse{
+  0%,100%{box-shadow:0 4px 18px rgba(67,56,202,.28), 0 1px 3px rgba(67,56,202,.14), 0 0 0 0 rgba(67,56,202,.55)}
+  50%{box-shadow:0 4px 18px rgba(67,56,202,.28), 0 1px 3px rgba(67,56,202,.14), 0 0 0 14px rgba(67,56,202,0)}
+}
+
+/* mini stats */
+.stats{display:flex;gap:clamp(20px,3vw,52px);flex-wrap:wrap}
+.stat .v{font-family:"Fraunces",serif;font-size:clamp(28px,3.6vw,46px);font-weight:500;letter-spacing:-.02em;line-height:1}
+.stat .l{font-size:12.5px;color:var(--muted);margin-top:6px;letter-spacing:.02em}
+
+/* taxonomy quadrant */
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,18px)}
+@media (max-width:760px){.quad{grid-template-columns:1fr}}
+.qcell{border-radius:var(--r);border:1px solid var(--line);background:var(--surface);padding:clamp(15px,1.8vw,22px);box-shadow:var(--shadow)}
+.qcell .qh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.qcell .qh .ic{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:16px}
+.qcell .qh b{font-size:clamp(14px,1.4vw,17px)}
+.qcell .qh .qs{font-size:11.5px;color:var(--faint);display:block}
+.qcell .items{display:flex;flex-wrap:wrap;gap:7px}
+.qcell .items span{font-size:12px;background:#F2F1EE;border:1px solid var(--line);padding:4px 10px;border-radius:30px;color:var(--ink);font-weight:500}
+
+/* note callout */
+.note{display:flex;gap:12px;align-items:flex-start;background:var(--accent-soft);border:1px solid #D9DCFB;border-radius:14px;padding:14px 18px;margin-top:clamp(14px,2vw,24px)}
+.note .ic{flex:none;font-size:18px}
+.note p{font-size:clamp(12.5px,1.2vw,14.5px);color:var(--accent-ink);line-height:1.5}
+.note.warm{background:var(--warm-soft);border-color:#F3D8CC}
+.note.warm p{color:#9A3D22}
+
+/* co-evolution arc (page 9 extension) */
+.ceevo{margin:.7em 0 .8em}
+.ceevo svg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+.ceevo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ceevo-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 16px;box-shadow:var(--shadow);border-top:3px solid var(--line-strong)}
+.ceevo-card.indigo{border-top-color:var(--accent)}
+.ceevo-card.warm{border-top-color:var(--warm)}
+.ceevo-card.coral{border-top-color:#E0603A}
+.ceevo-card b{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.01em}
+.ceevo-card.indigo b{color:var(--accent-ink)}
+.ceevo-card.warm b{color:#9A3D22}
+.ceevo-card.coral b{color:#B8492A}
+.ceevo-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
+@media (max-width:760px){.ceevo-grid{grid-template-columns:1fr}}
+
+/* resource links */
+.links{display:flex;flex-direction:column;gap:8px}
+.links a{font-size:14px;color:var(--accent);text-decoration:none;font-family:"JetBrains Mono",monospace;border-bottom:1px solid transparent}
+.links a:hover{border-bottom-color:var(--accent)}
+
+/* ReAct loop ring spin */
+.loop-ring{transform-box:fill-box;transform-origin:center}
+.slide.is-active .loop-ring{animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* directional triangle */
+.tri-edge{stroke-linecap:round}
+.slide.is-active .tri-edge{animation:edgepulse 3.4s var(--ease) infinite}
+.slide.is-active .tri-edge.e2{animation-delay:.25s}
+.slide.is-active .tri-edge.e3{animation-delay:.5s}
+@keyframes edgepulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* demo video cards */
+.demos{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,18px)}
+.demos.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.demos.three{grid-template-columns:1fr}}
+@media(max-width:760px){.demos{grid-template-columns:1fr}}
+.demo{position:relative;display:block;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#1C1C22 center/cover no-repeat;aspect-ratio:16/9;text-decoration:none;box-shadow:var(--shadow);transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.demo:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.demo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.6))}
+.demo .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;color:#1C1C22;font-size:15px;padding-left:3px;transition:transform .3s var(--ease)}
+.demo:hover .play{transform:translate(-50%,-50%) scale(1.12)}
+.demo .cap{position:absolute;left:13px;right:13px;bottom:11px;z-index:2;color:#fff}
+.demo .cap b{display:block;font-size:13px;font-weight:600;line-height:1.25}
+.demo .cap span{font-size:11px;opacity:.82}
+.repo{display:block;margin-top:.7em;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--accent);text-decoration:none}
+.repo:hover{text-decoration:underline}
+
+/* layer stack (model / harness / framework) */
+.stack{display:flex;flex-direction:column;gap:8px;max-width:780px}
+.layer{border-radius:13px;padding:13px 18px;border:1px solid var(--line);display:flex;align-items:baseline;gap:14px;box-shadow:var(--shadow)}
+.layer .lt{font-weight:600;font-size:clamp(13px,1.35vw,16px);white-space:nowrap;flex:none;min-width:96px}
+.layer .ld{font-size:clamp(12px,1.15vw,14px);color:var(--muted);line-height:1.4}
+.layer .ld code{font-family:"JetBrains Mono",monospace;font-size:.86em;color:var(--accent-ink)}
+.layer.l1{background:var(--surface)}
+.layer.l2{background:var(--accent-soft);border-color:#D9DCFB}
+.layer.l2 .lt{color:var(--accent-ink)}
+.layer.l3{background:var(--warm-soft);border-color:#F3D8CC;position:relative}
+.layer.l3 .lt{color:#B8492A}
+.layer .badge{margin-left:auto;flex:none;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#B8492A;background:#fff;border:1px solid #F3D8CC;border-radius:30px;padding:3px 9px;align-self:center}
+
+/* layer breadcrumb */
+.ladder{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:clamp(13px,1.8vw,20px)}
+.ladder .rung{font-size:clamp(11.5px,1.15vw,14px);font-weight:600;padding:6px 13px;border-radius:30px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
+.ladder .rung.r2{background:var(--accent-soft);border-color:#D9DCFB;color:var(--accent-ink)}
+.ladder .rung.r3{background:var(--warm-soft);border-color:#F3D8CC;color:#B8492A}
+.ladder .rung.r3 em{font-style:normal;opacity:.65;font-weight:500}
+.ladder .arr{color:var(--faint);font-size:15px}
+
+/* WSE gateway architecture diagram */
+.gw-arch-cap{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:1.1em 0 .55em}
+.gw-arch{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch}
+.gw-arch .gnode{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:5px}
+.gw-arch .gnode.accent{background:var(--accent-soft);border-color:#D9DCFB}
+.gw-arch .gnode .glbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.gw-arch .gnode.accent .glbl{color:var(--accent-ink)}
+.gw-arch .gnode h4{font-size:clamp(13px,1.2vw,15px);font-weight:600;margin:0;font-family:Inter,sans-serif}
+.gw-arch .gnode p{font-size:clamp(10.5px,1vw,12.5px);color:var(--muted);line-height:1.45;margin:0}
+.gw-arch .garr{display:flex;flex-direction:column;justify-content:center;align-items:center;color:var(--accent);font-weight:600;font-size:24px;min-width:46px;line-height:1}
+.gw-arch .garr small{display:block;font-size:9.5px;color:var(--faint);letter-spacing:.04em;text-align:center;font-weight:500;line-height:1.2;margin-top:3px;text-transform:uppercase}
+@media (max-width:760px){.gw-arch{grid-template-columns:1fr;gap:6px}.gw-arch .garr{transform:rotate(90deg);min-width:0;font-size:18px;padding:2px 0}}
+
+/* model landscape */
+.mglabel{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.55em}
+.mglabel.warm{color:var(--warm)}
+.mrow{display:flex;gap:14px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mp{flex:none;width:78px;font-size:11.5px;color:var(--faint);font-weight:600}
+.mm{font-size:clamp(12.5px,1.25vw,15px);font-weight:500}
+.mm .mono{font-size:.92em}
+.star{color:var(--warm);font-style:normal;font-size:.82em;margin-left:.25em;vertical-align:.05em}
+.concepts{display:flex;flex-direction:column;gap:9px}
+.cpt{padding-left:13px;border-left:3px solid var(--line-strong)}
+.cpt b{display:block;font-size:clamp(12.5px,1.25vw,15px);font-weight:600}
+.cpt span{font-size:clamp(11px,1.05vw,13px);color:var(--muted);line-height:1.4}
+.cpt:nth-child(1){border-color:var(--accent)}
+.cpt:nth-child(2){border-color:var(--teal)}
+.cpt:nth-child(3){border-color:var(--warm)}
+.cpt:nth-child(4){border-color:#0891B2}
+.cpt:nth-child(5){border-color:#DB2777}
+.cpt:nth-child(6){border-color:#7C3AED}
+.cpt:nth-child(7){border-color:var(--gold)}
+
+/* persistent equation indicator (slides 3-9) */
+.eqbadge{display:flex;width:fit-content;align-items:center;gap:6px;margin-bottom:clamp(11px,1.5vw,18px);padding:4px 6px;border:1px solid var(--line);border-radius:30px;background:var(--surface);box-shadow:var(--shadow)}
+.eqbadge .eqp{font-family:"Fraunces",serif;font-size:clamp(11.5px,1.1vw,14px);font-weight:500;color:var(--faint);padding:3px 11px;border-radius:30px;transition:.35s var(--ease);line-height:1}
+.eqbadge .eqop{color:var(--faint);font-size:12px;font-family:"Fraunces",serif}
+.eqbadge .eqp.on.model{background:var(--accent);color:#fff}
+.eqbadge .eqp.on.harness{background:var(--warm);color:#fff}
+.eqbadge .eqp.on.agent{background:var(--ink);color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div class="progress"><div class="progress__bar" id="bar"></div></div>
+<nav class="dots" id="dots"></nav>
+<div class="counter"><b id="cur">01</b> / <span id="total">12</span></div>
+<div class="brand"><span class="dot"></span> AI Tools for SE</div>
+<div class="hint"><span><kbd>←</kbd> <kbd>→</kbd> navigate</span><span><kbd>F</kbd> fullscreen</span><span><kbd>1</kbd>–<kbd>9</kbd> jump</span></div>
+
+<main id="deck">
+
+<!-- ============ 1 · TITLE ============ -->
+<section class="slide center" data-title="Welcome">
+  <div class="slide__inner">
+    <h1 data-anim>AI Tools for<br><span class="ink-accent">Software Engineering</span></h1>
+    <p class="lead" data-anim style="margin-top:1.2em">From the chat window to autonomous agents — a mental model for the tools
+      you'll actually use this summer, why they work, and what JHU gives you to build with.</p>
+  </div>
+</section>
+
+<!-- ============ 3 · THE FORMULA ============ -->
+<section class="slide center" data-title="Agent = Model + Harness">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>The one equation to remember</div>
+    <h2 data-anim>So what actually <em>is</em> an agent?</h2>
+    <div class="formula">
+      <span class="fterm box" data-anim>Agent</span>
+      <span class="fop" data-anim>=</span>
+      <span class="fterm box model" data-anim>Model</span>
+      <span class="fop" data-anim>+</span>
+      <span class="fterm box harness" data-anim>Harness</span>
+    </div>
+    <p class="lead" data-anim style="margin-top:.4em">A raw model just turns text in → text out. It becomes an <strong>agent</strong> the moment a
+      <span class="hl">harness</span> wraps it with state, tools, feedback loops, and constraints.</p>
+    <div class="grid cols-2" data-anim style="margin-top:2em;text-align:left;max-width:820px;margin-left:auto;margin-right:auto">
+      <div class="card"><h3><span class="ink-accent">The Model</span></h3><p>The intelligence. Takes in text / images / audio and outputs text. Brilliant, but inert on its own.</p></div>
+      <div class="card" style="border-top:3px solid var(--warm)"><h3><span class="ink-warm">The Harness</span></h3><p>"Every piece of code, configuration, and execution logic that <em>isn't</em> the model." It makes the intelligence useful.</p></div>
+    </div>
+    <p class="attrib" data-anim>Framing: <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank" rel="noopener">LangChain — <em>"The Anatomy of an Agent Harness"</em></a></p>
+  </div>
+</section>
+
+<!-- ============ 6 · AGENT LANDSCAPE ============ (refine with agent C) -->
+<section class="slide" data-title="The agent landscape" data-eq="agent">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Meet the players</div>
+    <h2 data-anim>The coding agents you'll hear about</h2>
+    <div class="split" style="align-items:stretch">
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="card" data-anim><h3><span class="ic" style="background:var(--warm-soft)">✳</span>Claude Code</h3>
+          <p><strong>Anthropic.</strong> Terminal-native agent. Runs on Claude (Opus / Sonnet). Skills, subagents, MCP, hooks — the most extensible harness.</p></div>
+        <div class="card" data-anim><h3><span class="ic" style="background:#E9F0F7">◆</span>Codex</h3>
+          <p><strong>OpenAI.</strong> CLI + cloud agent on GPT-5.x codex models. Strong at long-horizon runs &amp; large refactors; local ↔ cloud handoff.</p></div>
+        <div class="card" data-anim><h3><span class="ic" style="background:#EEF7EE">⧉</span>GitHub Copilot</h3>
+          <p><strong>GitHub / Microsoft.</strong> From autocomplete → "agent mode" in your editor + a cloud coding agent that turns an Issue into a PR. Model-agnostic.</p></div>
+        <div class="card" data-anim><h3><span class="ic" style="background:#F1EAFB">π</span>Pi <span class="tag gray" style="font-size:9px">pi-mono</span></h3>
+          <p><strong>Mario Zechner, open-source.</strong> A deliberately <em>minimal</em> terminal agent — 4 tools (Read/Write/Edit/Bash), model-agnostic, radically extensible. Anti-bloat.</p></div>
+      </div>
+      <div class="win" data-anim style="align-self:center">
+        <div class="win__bar"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span class="t">claude — ~/project</span></div>
+        <div class="win__body">
+<span class="pr">›</span> add rate-limiting to the API<br>
+<span class="cm">⏺ I'll add a token-bucket limiter.</span><br>
+<span class="ac">⏺ Read(src/server.ts)</span><br>
+<span class="ac">⏺ Edit(src/middleware/limit.ts)</span><br>
+<span class="ac">⏺ Bash(npm test)</span><br>
+<span class="ok">  ✓ 28 passing</span><br>
+<span class="cm">⏺ Done. Added limiter + 3 tests.</span><br>
+<span class="pr">›</span> <span style="opacity:.6">▍</span>
+        </div>
+      </div>
+    </div>
+    <div class="demos three" data-anim style="margin-top:1.1em">
+      <a class="demo" href="https://www.youtube.com/watch?v=zTS4pR1-r6A" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/zTS4pR1-r6A/hqdefault.jpg')">
+        <span class="play">▶</span>
+        <span class="cap"><b>Claude Code — quick start</b><span>YouTube · Matt Tanner (community) · ~5 min</span></span></a>
+      <a class="demo" href="https://www.youtube.com/watch?v=FUq9qRwrDrI" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/FUq9qRwrDrI/hqdefault.jpg')">
+        <span class="play">▶</span>
+        <span class="cap"><b>OpenAI Codex CLI — launch demo</b><span>YouTube · OpenAI · ~6 min</span></span></a>
+      <a class="demo" href="https://www.youtube.com/watch?v=1GVBRhDI5No" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/1GVBRhDI5No/hqdefault.jpg')">
+        <span class="play">▶</span>
+        <span class="cap"><b>GitHub Copilot coding agent</b><span>YouTube · GitHub Checkout · ~6 min</span></span></a>
+    </div>
+    <div class="note" data-anim><span class="ic">🔁</span><p>Different UIs, <strong>same equation</strong>. Each is a model wrapped in a harness — they differ mainly in <em>which</em> tools, how much autonomy, and where they run.</p></div>
+  </div>
+</section>
+
+<!-- ============ 3b · THE MODEL LAYER (SOTA models) ============ -->
+<section class="slide" data-title="The model layer · SOTA, 2026" data-eq="model">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Zoom into the model</div>
+    <h2 data-anim>The LLMs inside the agents</h2>
+    <p class="lead" data-anim style="margin-bottom:1em">Every agent runs on a large language model — the <strong>Model</strong> half of the equation. The frontier moves weekly; here's the May 2026 picture. <span style="color:var(--faint)">★ = strong for code agents.</span></p>
+    <div class="split" style="align-items:start;gap:clamp(18px,3vw,46px)">
+      <div>
+        <div data-anim>
+          <div class="mglabel">Frontier · proprietary (API)</div>
+          <div class="mrow"><span class="mp">Anthropic</span><span class="mm">Claude Opus 4.7 · Sonnet 4.6 <i class="star">★</i></span></div>
+          <div class="mrow"><span class="mp">OpenAI</span><span class="mm">GPT-5.5 · GPT-5.3-Codex <i class="star">★</i></span></div>
+          <div class="mrow"><span class="mp">Google</span><span class="mm">Gemini 3 Pro <i class="star">★</i></span></div>
+          <div class="mrow"><span class="mp">xAI</span><span class="mm">Grok 4</span></div>
+        </div>
+        <div data-anim style="margin-top:1.05em">
+          <div class="mglabel warm">Open-weight · run / fine-tune yourself</div>
+          <div class="mrow"><span class="mp">Alibaba</span><span class="mm">Qwen3 · <span class="mono">Qwen3-Coder</span> <i class="star">★</i></span></div>
+          <div class="mrow"><span class="mp">OpenAI</span><span class="mm"><span class="mono">gpt-oss</span> 120b / 20b</span></div>
+          <div class="mrow"><span class="mp">DeepSeek</span><span class="mm">V3 · R1 <i class="star">★</i></span></div>
+          <div class="mrow"><span class="mp">Others</span><span class="mm">Llama 4 · Kimi K2 · GLM · Mistral</span></div>
+        </div>
+      </div>
+      <div data-anim>
+        <div class="mglabel">Concepts worth knowing</div>
+        <div class="concepts">
+          <div class="cpt"><b>Reasoning / "thinking" models</b><span>spend extra compute to reason before answering — better at multi-step agent work</span></div>
+          <div class="cpt"><b>Context window</b><span>how much it can read at once — the scarce resource a harness must manage</span></div>
+          <div class="cpt"><b>Tool use / function calling</b><span>emits structured calls — the capability that makes agents possible at all</span></div>
+          <div class="cpt"><b>Tokens · input vs output</b><span>the unit of pricing — input (what you send) is cheap; output (what it writes) is typically 4–5× more; long context bloats the input bill</span></div>
+          <div class="cpt"><b>KV cache / prompt caching</b><span>reuse the model's prefix compute across calls — big latency &amp; cost win when system prompts &amp; tool defs stay stable (agents re-send the same prefix every turn)</span></div>
+          <div class="cpt"><b>Open weight ≠ open source</b><span>you get the weights to run &amp; fine-tune; training data &amp; license still vary</span></div>
+          <div class="cpt"><b>MoE &amp; tiers</b><span>Mixture-of-Experts = huge but efficient; pick flagship vs fast (Opus/Sonnet/Haiku)</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="spec-cap" data-anim>The OpenAI-Compatible API · one turn with tool calling <small>— the de facto wire format every code agent &amp; gateway speaks</small></div>
+    <div class="spec" data-anim>
+      <div class="spec-blk">
+        <div class="h req"><i style="background:#C4B5FD"></i><span class="v">REQUEST</span><span class="ep">POST /v1/chat/completions</span></div>
+<pre>{
+  <span class="k">"model"</span>: <span class="s">"gpt-5.5"</span>,
+  <span class="k">"messages"</span>: [
+    {<span class="k">"role"</span>:<span class="s">"system"</span>, <span class="k">"content"</span>:<span class="s">"You are a coding agent."</span>},
+    {<span class="k">"role"</span>:<span class="s">"user"</span>,   <span class="k">"content"</span>:<span class="s">"Add input validation to login()"</span>}
+  ],
+  <mark><span class="k">"tools"</span>: [{
+    <span class="k">"type"</span>: <span class="s">"function"</span>,
+    <span class="k">"function"</span>: {
+      <span class="k">"name"</span>: <span class="s">"read_file"</span>,
+      <span class="k">"description"</span>: <span class="s">"Read a file from the workspace"</span>,
+      <span class="k">"parameters"</span>: {<span class="k">"type"</span>:<span class="s">"object"</span>,
+        <span class="k">"properties"</span>:{<span class="k">"path"</span>:{<span class="k">"type"</span>:<span class="s">"string"</span>}},
+        <span class="k">"required"</span>:[<span class="s">"path"</span>]}
+    }
+  }]</mark>
+}</pre>
+      </div>
+      <div class="spec-blk">
+        <div class="h res"><i style="background:#86EFAC"></i><span class="v">RESPONSE</span><span class="ep">200 OK</span></div>
+<pre>{
+  <span class="k">"id"</span>: <span class="s">"chatcmpl-9f2b…"</span>,
+  <span class="k">"choices"</span>: [{
+    <span class="k">"message"</span>: {
+      <span class="k">"role"</span>: <span class="s">"assistant"</span>,
+      <span class="k">"content"</span>: <span class="nl">null</span>,
+      <span class="hl"><span class="k">"tool_calls"</span>: [{
+        <span class="k">"id"</span>: <span class="s">"call_abc123"</span>,
+        <span class="k">"type"</span>: <span class="s">"function"</span>,
+        <span class="k">"function"</span>: {
+          <span class="k">"name"</span>: <span class="s">"read_file"</span>,
+          <span class="k">"arguments"</span>: <span class="s">"{\"path\":\"src/auth/login.ts\"}"</span>
+        }
+      }]</span>
+    },
+    <span class="k">"finish_reason"</span>: <span class="s">"tool_calls"</span>
+  }],
+  <span class="k">"usage"</span>: {<span class="k">"prompt_tokens"</span>:<span class="n">412</span>, <span class="k">"completion_tokens"</span>:<span class="n">38</span>}
+}</pre>
+      </div>
+    </div>
+    <div class="note" data-anim><span class="ic">🔌</span><p><strong>The model isn't everything.</strong> A good harness lifts the <em>same</em> model 5–15 pts on <span class="mono" style="font-size:.9em">SWE-bench</span> (the coding-agent benchmark) — context retrieval is often the bottleneck, not raw model IQ. <span style="color:var(--faint)">Versions move fast — verify before presenting.</span></p></div>
+  </div>
+</section>
+
+<!-- ============ 4 · HISTORY ============ -->
+<section class="slide" data-title="A short history" data-eq="harness">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>How we got here</div>
+    <h2 data-anim>Three eras of "talking to models"</h2>
+    <p class="lead" data-anim>Each era didn't replace the last — it <strong>wrapped</strong> it. Today's harnesses are mostly delivery mechanisms for good context engineering.</p>
+    <div class="timeline">
+      <div class="tl" data-anim>
+        <div class="node">P</div>
+        <div class="yr">~2020–2022</div>
+        <h3>Prompt engineering</h3>
+        <p>Craft the perfect single message. "Think step by step," few-shot examples, role-play. The model is a stateless oracle.</p>
+      </div>
+      <div class="tl" data-anim>
+        <div class="node">C</div>
+        <div class="yr">~2023–2024</div>
+        <h3>Context engineering</h3>
+        <p>The prompt is dynamic. Retrieve the right files, memories, and tool results — and <em>manage the window</em> as a scarce resource.</p>
+      </div>
+      <div class="tl" data-anim>
+        <div class="node">H</div>
+        <div class="yr">2025 →</div>
+        <h3>Harness engineering</h3>
+        <p>Build the whole system around the model: loops, tools, subagents, hooks, compaction. <em>"If you're not the model, you're the harness."</em></p>
+      </div>
+    </div>
+    <div class="note" data-anim><span class="ic">🧠</span><p><strong>Context is precious &amp; scarce.</strong> Harnesses add strategies like <strong>compaction</strong> (summarize &amp; offload) and <strong>continuation</strong> (re-inject the goal into a clean window) to keep working past the limit.</p></div>
+  </div>
+</section>
+
+<!-- ============ 5 · ANATOMY OF A HARNESS ============ -->
+<section class="slide" data-title="Anatomy of a harness" data-eq="harness">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Open the box</div>
+    <h2 data-anim>What's inside the harness</h2>
+    <div class="split">
+      <div>
+        <p class="lead" data-anim style="margin-bottom:1.1em">Five kinds of "everything that isn't the model" — plus the loop that ties them together.</p>
+        <div class="chips">
+          <div class="chip" data-anim><span class="d" style="background:var(--accent)"></span>System prompts &amp; priors</div>
+          <div class="chip" data-anim><span class="d" style="background:var(--teal)"></span>Tools, Skills &amp; MCP</div>
+          <div class="chip" data-anim><span class="d" style="background:var(--warm)"></span>Infra: filesystem · sandbox · browser</div>
+          <div class="chip" data-anim><span class="d" style="background:var(--gold)"></span>Orchestration: subagents · routing</div>
+          <div class="chip" data-anim><span class="d" style="background:#7C3AED"></span>Hooks &amp; middleware (deterministic)</div>
+        </div>
+        <div class="note" data-anim style="margin-top:1.4em"><span class="ic">💾</span><p><strong>The filesystem is the most foundational primitive</strong> — durable state across sessions, and a natural place for human + agent to collaborate.</p></div>
+      </div>
+      <div>
+        <div class="loop-wrap" style="flex-direction:column;gap:14px">
+          <svg class="loop-svg" id="loopSvg" viewBox="-18 -18 236 236" data-anim>
+            <circle cx="100" cy="100" r="74" fill="none" stroke="#E8E6E2" stroke-width="2"/>
+            <circle class="loop-ring" cx="100" cy="100" r="74" fill="none" stroke="#4338CA" stroke-width="3" stroke-linecap="round" stroke-dasharray="350 116"/>
+            <g font-family="Inter,sans-serif" font-weight="600" font-size="11.5" text-anchor="middle" fill="#17171B">
+              <g><circle cx="100" cy="26" r="15" fill="#EEF0FE"/><text x="100" y="30" fill="#3730A3">1</text><text x="100" y="4">Reason</text></g>
+              <g><circle cx="164" cy="137" r="15" fill="#E2F4F1"/><text x="164" y="141" fill="#0B6B64">2</text><text x="164" y="174">Act · tool call</text></g>
+              <g><circle cx="36" cy="137" r="15" fill="#FCEFE9"/><text x="36" y="141" fill="#B8492A">3</text><text x="36" y="174">Observe result</text></g>
+            </g>
+          </svg>
+          <div data-anim style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <p class="mono" style="font-size:12.5px;color:var(--muted);text-align:center;margin:0">the&nbsp;<span class="ink-accent">ReAct</span>&nbsp;loop — reason → act → observe ↻</p>
+            <p class="mono" style="font-size:10.5px;color:var(--faint);text-align:center;margin:0">Yao et&nbsp;al., 2022 · <a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">arXiv:2210.03629</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 · CLAUDE CODE CONCEPTS ============ -->
+<section class="slide" data-title="Claude Code building blocks" data-eq="harness">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Deep dive · Claude Code</div>
+    <h2 data-anim>Six building blocks of a real harness</h2>
+    <div class="rows">
+      <div class="row" data-anim><div class="lab"><span class="ic" style="background:var(--teal-soft)">🔌</span>MCP</div>
+        <div class="desc"><strong>Tools / hands.</strong> An open protocol that plugs the agent into live systems — GitHub, Postgres, Sentry, Slack. No more pasting logs; it reads &amp; writes the real thing. <code>claude mcp add ...</code></div></div>
+      <div class="row" data-anim><div class="lab"><span class="ic" style="background:var(--accent-soft)">📖</span>Skills</div>
+        <div class="desc"><strong>Knowledge / playbooks.</strong> A <code>SKILL.md</code> with a short description that auto-loads <em>only when relevant</em> (progressive disclosure) — reusable procedures that cost ~0 context until triggered.</div></div>
+      <div class="row" data-anim><div class="lab"><span class="ic" style="background:#EFEAFB">🤖</span>Subagents</div>
+        <div class="desc"><strong>Delegation &amp; isolation.</strong> Spin up a worker with its own context window for noisy side-tasks (e.g. searching the whole repo); only the summary returns. Fan out many in parallel.</div></div>
+      <div class="row" data-anim><div class="lab"><span class="ic" style="background:#F0EFEC">⌘</span>Commands</div>
+        <div class="desc"><strong>Control surface.</strong> What you type to drive a session — <code>/model</code>, <code>/compact</code>, <code>/plan</code>, or your own saved skills like <code>/code-review</code>.</div></div>
+      <div class="row" data-anim><div class="lab"><span class="ic" style="background:var(--warm-soft)">🪝</span>Hooks</div>
+        <div class="desc"><strong>Deterministic guardrails.</strong> Shell/HTTP automations on lifecycle events (<code>PreToolUse</code>, <code>PostToolUse</code>…) — auto-format on edit, block an <code>rm -rf</code>. Outside the model's discretion.</div></div>
+      <div class="row" data-anim><div class="lab"><span class="ic" style="background:#FEF3C7">⚡</span>Routines<span class="tag warm" style="margin-left:6px">new</span></div>
+        <div class="desc"><strong>Autopilot ("workflows").</strong> A saved prompt + repos + connectors that runs <em>unattended in the cloud</em> — on a schedule, a GitHub event, or an API call. Composes all the layers above.</div></div>
+    </div>
+    <div class="note" data-anim><span class="ic">🧭</span><p><strong>Mental model:</strong> MCP = tools · Skills = knowledge · Subagents = delegation · Commands = how you invoke · Hooks = guardrails · Routines = scheduled autonomy.</p></div>
+    <a class="refbtn" href="https://code.claude.com/docs/en/agents" target="_blank" rel="noopener" data-anim>
+      <span class="ic">📖</span>
+      <span class="col">
+        <span class="lbl">Reference</span>
+        <span class="url">code.claude.com/docs/en/agents</span>
+      </span>
+      <span class="arr">↗</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============ 8 · FRAMEWORKS ON TOP OF THE HARNESS ============ -->
+<section class="slide" data-title="Built on top: Superpowers & GSD" data-eq="harness">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>One layer up</div>
+    <h2 data-anim>Methodologies built <em>on</em> the harness</h2>
+    <p class="lead" data-anim style="margin-bottom:.85em">Important distinction: these <strong>aren't harnesses</strong> — they're opinionated <em>methodologies</em> assembled from a harness's primitives (skills, commands, subagents) to enforce discipline on top of Claude Code.</p>
+    <div class="ladder" data-anim>
+      <span class="rung">Model</span><span class="arr">›</span>
+      <span class="rung r2">Harness · Claude Code</span><span class="arr">›</span>
+      <span class="rung r3">Methodology · GSD / Superpowers <em>← here</em></span>
+    </div>
+    <div class="grid cols-2" data-anim style="margin-bottom:1.1em">
+      <div class="card"><h3>⚡ Superpowers</h3><p>A skills <em>framework</em> by <strong>Jesse Vincent</strong> (<span class="mono">obra</span>). <em>Discipline over speed:</em> <code style="font-size:.85em">brainstorming</code> refuses to code first, <code style="font-size:.85em">TDD</code> enforces red/green, <code style="font-size:.85em">systematic-debugging</code> bans guessing.</p>
+        <a class="repo" href="https://github.com/obra/superpowers" target="_blank" rel="noopener">github.com/obra/superpowers ↗</a></div>
+      <div class="card"><h3>🎯 GSD <span class="tag gray">Get Sh*t Done</span></h3><p>A spec-driven <em>development system</em> by <strong>TÂCHES</strong> (<span class="mono">glittercowboy</span>): discuss → plan → execute → verify → ship. Each atomic task runs in a <em>fresh subagent</em>; atomic commits.</p>
+        <a class="repo" href="https://github.com/gsd-build/get-shit-done" target="_blank" rel="noopener">github.com/gsd-build/get-shit-done ↗</a></div>
+    </div>
+    <div class="demos" data-anim style="max-width:620px;margin:0 auto">
+      <a class="demo" href="https://www.youtube.com/watch?v=TX91PdBn_IA" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/TX91PdBn_IA/hqdefault.jpg')">
+        <span class="play">▶</span><span class="cap"><b>Superpowers — tutorial</b><span>YouTube · Eric Tech (community)</span></span></a>
+      <a class="demo" href="https://www.youtube.com/watch?v=uEit1oOJK0w" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/uEit1oOJK0w/hqdefault.jpg')">
+        <span class="play">▶</span><span class="cap"><b>GSD — "the missing piece"</b><span>YouTube · AI LABS (community)</span></span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9 · TRUSTING THE OUTPUT (triangle) ============ -->
+<section class="slide" data-title="Trusting the agent's output" data-eq="agent">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Reading what the agent built</div>
+    <h2 data-anim>Three checks on the output</h2>
+    <p class="lead" data-anim>An agent's real deliverable isn't just code that runs — it's the <strong>alignment</strong> between what you meant, what you specified, and what it built.</p>
+    <div class="tri-wrap" style="margin-top:1.3em">
+      <svg class="tri-svg" id="triSvg" viewBox="0 0 400 330" data-anim>
+        <defs>
+          <marker id="aA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4338CA"/></marker>
+          <marker id="aT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8E86"/></marker>
+          <marker id="aW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#E0603A"/></marker>
+        </defs>
+        <!-- directional edges -->
+        <line class="tri-edge e1" x1="108" y1="275" x2="292" y2="275" stroke="#4338CA" stroke-width="3" marker-start="url(#aA)" marker-end="url(#aA)"/>
+        <line class="tri-edge e2" x1="89.3" y1="242.3" x2="180.7" y2="87.7" stroke="#0E8E86" stroke-width="3" marker-start="url(#aT)" marker-end="url(#aT)"/>
+        <line class="tri-edge e3" x1="310.7" y1="242.3" x2="219.3" y2="87.7" stroke="#E0603A" stroke-width="3" marker-end="url(#aW)"/>
+        <!-- edge labels -->
+        <g font-family="JetBrains Mono,monospace" font-size="11" font-weight="500">
+          <text x="200" y="294" text-anchor="middle" fill="#4338CA">in sync</text>
+          <text x="118" y="150" text-anchor="end" fill="#0E8E86">aligned?</text>
+          <text x="282" y="150" text-anchor="start" fill="#B8492A">explain</text>
+        </g>
+        <!-- vertices -->
+        <g text-anchor="middle" font-family="Inter,sans-serif" font-weight="700" fill="#17171B">
+          <circle cx="200" cy="55" r="34" fill="#FFFFFF" stroke="#17171B" stroke-width="2"/><text x="200" y="60" font-size="14">Human</text>
+          <circle cx="70" cy="275" r="34" fill="#FFFFFF" stroke="#17171B" stroke-width="2"/><text x="70" y="280" font-size="14">Spec</text>
+          <circle cx="330" cy="275" r="34" fill="#FFFFFF" stroke="#17171B" stroke-width="2"/><text x="330" y="280" font-size="14">Code</text>
+        </g>
+      </svg>
+      <div class="tri-legend">
+        <div class="li e1" data-anim><b>Spec ↔ Code</b><p>The spec drives the code, and the code keeps the spec honest.</p></div>
+        <div class="li e2" data-anim><b>Human ↔ Spec</b><p>You shape the spec, and the spec sharpens what you actually want.</p></div>
+        <div class="li e3" data-anim><b>Code → Human</b><p>The model explains &amp; accounts for what it did.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9b · CO-EVOLUTION ARC (page 9 extension) ============ -->
+<section class="slide" data-title="Co-evolution arc" data-eq="agent">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Page 9 · extension</div>
+    <h2 data-anim>The <em>AI bar</em> &amp; the <em>AI ceiling</em></h2>
+    <p class="lead" data-anim>A cheap first ask already gets you a strong answer — that's the <strong>AI bar</strong>. The remaining climb to the <strong>AI ceiling</strong> is on <strong>you</strong>: add context, turn by turn.</p>
+
+    <div class="ceevo" data-anim>
+      <svg viewBox="0 0 720 280" preserveAspectRatio="xMidYMid meet">
+        <!-- light axes -->
+        <line x1="80" y1="30" x2="80" y2="250" stroke="#E8E6E2" stroke-width="1.4"/>
+        <line x1="80" y1="250" x2="640" y2="250" stroke="#E8E6E2" stroke-width="1.4"/>
+        <text x="74" y="24" text-anchor="end" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#9A9AA2">answer quality ↑</text>
+        <text x="640" y="273" text-anchor="end" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#9A9AA2">context added →</text>
+
+        <!-- AI bar level (raised — first cheap reply is usually already quite good) -->
+        <line x1="80" y1="110" x2="640" y2="110" stroke="#6B6B73" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="645" y="114" font-family="JetBrains Mono,monospace" font-size="11" fill="#6B6B73" font-weight="700">AI bar</text>
+        <text x="645" y="125" font-family="Inter,sans-serif" font-size="9" fill="#9A9AA2" font-style="italic">first cheap reply</text>
+
+        <!-- AI ceiling level -->
+        <line x1="80" y1="55" x2="640" y2="55" stroke="#4338CA" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="645" y="59" font-family="JetBrains Mono,monospace" font-size="11" fill="#4338CA" font-weight="700">AI ceiling</text>
+
+        <!-- climbing 2-step staircase from AI bar toward AI ceiling -->
+        <polyline points="100,110 175,110 175,92 305,78 305,68 460,60 540,57 610,56"
+          fill="none" stroke="#4338CA" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- one "+ context" annotation -->
+        <text x="188" y="103" font-family="Inter,sans-serif" font-size="11" font-style="italic" fill="#4338CA">+ context</text>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 9 · CONCEPTS: RAG + BUILD PHILOSOPHY ============ (refine with agent C) -->
+<section class="slide" data-title="RAG & two build philosophies">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Two ideas worth knowing</div>
+    <h2 data-anim>RAG, and how people build agents</h2>
+    <div class="split" style="align-items:start">
+      <div data-anim>
+        <span class="tag teal">Concept</span>
+        <h3 style="font-family:Fraunces;font-weight:500;font-size:clamp(20px,2.4vw,30px);margin:.4em 0">RAG — Retrieval-Augmented Generation</h3>
+        <p class="lead" style="font-size:clamp(14px,1.4vw,17px)">Don't fine-tune facts in — <strong>fetch them at query time.</strong> Embed your docs/codebase into vectors, retrieve the top-k relevant chunks, and paste them into the prompt as context.</p>
+        <div class="note" style="margin-top:1em"><span class="ic">🔎</span><p>For code, the field is shifting from vector-RAG → <strong>agentic search</strong>: instead of pre-indexing, the agent just greps &amp; reads files on demand (how Claude Code works). Often more accurate for repos.</p></div>
+      </div>
+      <div data-anim>
+        <span class="tag indigo">Debate</span>
+        <h3 style="font-family:Fraunces;font-weight:500;font-size:clamp(20px,2.4vw,30px);margin:.4em 0">Framework vs. model-native</h3>
+        <div class="vs" style="grid-template-columns:1fr;gap:12px">
+          <div class="panel a" style="border-top-width:3px"><h3 style="font-size:16px">Framework-style</h3><div class="sub">LangChain · LangGraph</div>
+            <ul><li>Explicit graphs &amp; orchestration you control</li><li>Great when steps must be reliable / auditable</li><li>More scaffolding to maintain</li></ul></div>
+          <div class="panel b" style="border-top-width:3px"><h3 style="font-size:16px">Model-native</h3><div class="sub">Claude Agent SDK · OpenAI Agents SDK</div>
+            <ul><li>Trust a strong model in a simple tool loop</li><li>Less code; the model does the planning</li><li>Rides the curve as models improve</li></ul></div>
+        </div>
+      </div>
+    </div>
+    <div class="note warm" data-anim><span class="ic">📈</span><p><strong>The trend (per Anthropic's <em>Building Effective Agents</em>):</strong> start with direct API calls; add a framework only when it <em>demonstrably</em> helps. As models improve, harnesses get thinner — more logic moves into the model.</p></div>
+  </div>
+</section>
+
+<!-- ============ 10 · DSAI INFRASTRUCTURE ============ -->
+<section class="slide" data-title="What JHU DSAI gives you">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Your toolbox at Hopkins</div>
+    <h2 data-anim>AI infrastructure DSAI provides</h2>
+    <p class="lead" data-anim style="margin-bottom:1.3em">You don't pay per token out of pocket — JHU runs the gateways, licenses, and GPUs. Use them.</p>
+    <div class="grid cols-2" data-anim>
+      <div class="card"><h3><span class="ic" style="background:var(--accent-soft)">🛡️</span>WSE AI Gateway</h3>
+        <p>One endpoint → OpenAI, Anthropic, Gemini, Grok &amp; Workers AI, with centralized billing. <span class="mono" style="font-size:.85em">gateway.engineering.jhu.edu</span>. Drop-in OpenAI-compatible: set <code class="mono">base_url</code> + a <span class="mono">jhu_live_sk_</span> key. <span class="tag gray" style="margin-top:6px">beta · no HIPAA data</span></p></div>
+      <div class="card"><h3><span class="ic" style="background:#EEF7EE">💬</span>ChatGPT EDU</h3>
+        <p>Institution-licensed ChatGPT for coursework &amp; research — frontier models with enterprise data handling, no personal subscription needed.</p></div>
+      <div class="card"><h3><span class="ic" style="background:#EEF7EE">⧉</span>GitHub Copilot</h3>
+        <p>Free / education tier for students &amp; staff — inline completion + agent mode right inside VS Code. Pair it with the WSE Gateway for chat.</p></div>
+      <div class="card"><h3><span class="ic" style="background:var(--warm-soft)">🖥️</span>DSAI HPC Cluster</h3>
+        <p>ARCH-run GPU cluster: <strong>312 GPUs</strong> (A100 / H100 / H100-NVL / L40S), 5 PB storage, SLURM scheduling. For training &amp; large jobs. <span class="mono" style="font-size:.85em">ssh dsailogin.arch.jhu.edu</span></p></div>
+    </div>
+    <div class="gw-arch-cap" data-anim>How a request flows through the WSE Gateway</div>
+    <div class="gw-arch" data-anim>
+      <div class="gnode">
+        <span class="glbl">You</span>
+        <h4>Your agent harness</h4>
+        <p>Claude Code · Codex · Cursor · custom Python/Node — calls an OpenAI-compatible URL with a <span class="mono" style="font-size:.92em">jhu_live_sk_</span> key</p>
+      </div>
+      <div class="garr">→<small>HTTPS</small></div>
+      <div class="gnode accent">
+        <span class="glbl">JHU · Cloudflare edge</span>
+        <h4>WSE AI Gateway</h4>
+        <p>One endpoint · key &amp; rate-limit management · centralized billing &amp; usage logs</p>
+      </div>
+      <div class="garr">→<small>provider API</small></div>
+      <div class="gnode">
+        <span class="glbl">Hosted in cloud</span>
+        <h4>Model providers</h4>
+        <p>OpenAI · Anthropic · Gemini · Grok · Workers AI — run on each vendor's own infra</p>
+      </div>
+    </div>
+    <div class="note" data-anim><span class="ic">🔑</span><p><strong>Getting access:</strong> Gateway keys are <strong>centrally provisioned</strong> — ask your project lead for a <span class="mono">jhu_live_sk_</span> key (don't self-mint).</p></div>
+  </div>
+</section>
+
+<!-- ============ 11 · HOW TO START ============ -->
+<section class="slide" data-title="How to start">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Make it practical</div>
+    <h2 data-anim>How to actually start this week</h2>
+    <div class="grid" style="grid-template-columns:1fr;gap:16px;max-width:860px">
+      <div class="bullet" data-anim><div class="n">1</div><div><h3>Pick one agent and live in it</h3><p>Install Claude Code or Codex. Point it at a real repo. Let it read, run tests, and edit — watch the ReAct loop work.</p></div></div>
+      <div class="bullet" data-anim><div class="n">2</div><div><h3>Spec before you prompt</h3><p>Write what you want first. Keep the <strong>Human–Spec–Code</strong> triangle tight: a one-paragraph spec beats ten vague follow-ups.</p></div></div>
+      <div class="bullet" data-anim><div class="n">3</div><div><h3>Route through the WSE Gateway</h3><p>Building your own agent? Use the JHU Gateway key, not a personal card. Heavy training? Submit it to the DSAI cluster.</p></div></div>
+    </div>
+    <div class="note warm" data-anim><span class="ic">💡</span><p><strong>The meta-skill:</strong> you're no longer just writing code — you're <em>designing the harness</em> that writes it. Spec clearly, verify ruthlessly, trust but check.</p></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var bar = document.getElementById('bar');
+  var curEl = document.getElementById('cur');
+  var dotsWrap = document.getElementById('dots');
+  var total = slides.length;
+  document.getElementById('total').textContent = String(total).padStart(2,'0');
+  var idx = 0;
+
+  // inject the "Agent = Model + Harness" indicator on themed slides
+  slides.forEach(function(s){
+    var eq = s.dataset.eq; if(!eq) return;
+    var inner = s.querySelector('.slide__inner'); if(!inner) return;
+    var b = document.createElement('div');
+    b.className = 'eqbadge'; b.setAttribute('data-anim','');
+    b.innerHTML =
+      '<span class="eqp agent'   + (eq==='agent'?' on':'')   + '">Agent</span><span class="eqop">=</span>' +
+      '<span class="eqp model'   + (eq==='model'?' on':'')   + '">Model</span><span class="eqop">+</span>' +
+      '<span class="eqp harness' + (eq==='harness'?' on':'') + '">Harness</span>';
+    inner.insertBefore(b, inner.firstChild);
+  });
+
+  // build dots
+  slides.forEach(function(s,i){
+    var b = document.createElement('button');
+    b.setAttribute('aria-label', s.dataset.title || ('Slide '+(i+1)));
+    var tip = document.createElement('span');
+    tip.className='tip'; tip.textContent = (i+1)+'. '+(s.dataset.title||'');
+    b.appendChild(tip);
+    b.addEventListener('click', function(){ go(i); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  function render(){
+    slides.forEach(function(s,i){
+      s.classList.remove('is-active','is-past');
+      var anims = s.querySelectorAll('[data-anim]');
+      if(i===idx){
+        s.classList.add('is-active');
+        anims.forEach(function(el,j){ el.style.transitionDelay = (60 + j*70)+'ms'; });
+      } else {
+        if(i<idx) s.classList.add('is-past');
+        anims.forEach(function(el){ el.style.transitionDelay = '0ms'; });
+      }
+    });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i===idx); });
+    bar.style.width = (total<2?100:(idx/(total-1))*100)+'%';
+    curEl.textContent = String(idx+1).padStart(2,'0');
+    location.hash = 'p'+(idx+1);
+  }
+  function go(n){ idx = Math.max(0, Math.min(total-1, n)); render(); }
+  function next(){ go(idx+1); }
+  function prev(){ go(idx-1); }
+
+  document.addEventListener('keydown', function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    switch(e.key){
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(total-1); break;
+      case 'f': case 'F':
+        if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); }
+        else { (document.exitFullscreen||function(){})(); }
+        break;
+      default:
+        if(/^[1-9]$/.test(e.key)){ go(parseInt(e.key,10)-1); }
+    }
+  });
+
+  // touch swipe
+  var x0=null;
+  deck.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  deck.addEventListener('touchend', function(e){
+    if(x0===null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx)>50){ dx<0 ? next() : prev(); }
+    x0=null;
+  }, {passive:true});
+
+  // wheel (debounced) for trackpads
+  var wlock=false;
+  deck.addEventListener('wheel', function(e){
+    if(Math.abs(e.deltaY)<24 && Math.abs(e.deltaX)<24) return;
+    if(wlock) return; wlock=true; setTimeout(function(){wlock=false;}, 600);
+    (e.deltaY>0||e.deltaX>0) ? next() : prev();
+  }, {passive:true});
+
+  // deep-link
+  var m = (location.hash||'').match(/p(\d+)/);
+  if(m){ idx = Math.max(0, Math.min(total-1, parseInt(m[1],10)-1)); }
+  render();
+})();
+</script>
+</body>
+</html>
