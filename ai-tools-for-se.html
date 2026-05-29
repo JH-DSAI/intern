@@ -133,6 +133,27 @@ strong{font-weight:600;color:var(--ink)}
 .win__body .ac{color:#C4B5FD}
 .win__body .ok{color:#86EFAC}
 
+/* request/response sample (OpenAI chat completions w/ tool calling) */
+.spec-cap{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:1.1em 0 .5em;display:flex;align-items:center;gap:8px}
+.spec-cap small{font-family:"JetBrains Mono",monospace;letter-spacing:0;text-transform:none;color:var(--faint);font-weight:500;font-size:11px}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spec-blk{background:#1C1C22;border-radius:11px;overflow:hidden;border:1px solid #2A2A33;box-shadow:var(--shadow-lg)}
+.spec-blk .h{display:flex;align-items:center;gap:7px;padding:7px 12px;background:#26262E;border-bottom:1px solid #33333D;font-size:10px;font-family:"JetBrains Mono",monospace;color:#9A9AA8;letter-spacing:.06em}
+.spec-blk .h i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.spec-blk .h .v{font-weight:700}
+.spec-blk .h.req .v{color:#C4B5FD}
+.spec-blk .h.res .v{color:#86EFAC}
+.spec-blk .h .ep{margin-left:auto;color:#6B7280;font-size:9.5px}
+.spec-blk pre{margin:0;padding:10px 13px;font-family:"JetBrains Mono",monospace;font-size:clamp(9.5px,.82vw,11.5px);line-height:1.55;color:#D6D6E0;white-space:pre;overflow:hidden;tab-size:2}
+.spec-blk pre .k{color:#9CB7FF}
+.spec-blk pre .s{color:#FBD38D}
+.spec-blk pre .n{color:#86EFAC}
+.spec-blk pre .nl{color:#FCA5A5}
+.spec-blk pre .c{color:#6B7280;font-style:italic}
+.spec-blk pre mark{background:rgba(196,181,253,.16);color:inherit;border-radius:3px;padding:0 2px}
+.spec-blk pre .hl{background:rgba(134,239,172,.14);border-radius:3px;padding:0 2px}
+@media (max-width:760px){.spec{grid-template-columns:1fr}}
+
 /* big formula */
 .formula{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:clamp(10px,1.4vw,22px);margin:clamp(18px,3vw,40px) 0}
 .fterm{font-family:"Fraunces",serif;font-size:clamp(30px,5vw,62px);font-weight:500;letter-spacing:-.02em;padding:clamp(10px,1.4vw,18px) clamp(16px,2vw,30px);border-radius:16px;line-height:1}
@@ -250,6 +271,21 @@ strong{font-weight:600;color:var(--ink)}
 .note.warm{background:var(--warm-soft);border-color:#F3D8CC}
 .note.warm p{color:#9A3D22}
 
+/* co-evolution arc (page 9 extension) */
+.ceevo{margin:.7em 0 .8em}
+.ceevo svg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+.ceevo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ceevo-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 16px;box-shadow:var(--shadow);border-top:3px solid var(--line-strong)}
+.ceevo-card.indigo{border-top-color:var(--accent)}
+.ceevo-card.warm{border-top-color:var(--warm)}
+.ceevo-card.coral{border-top-color:#E0603A}
+.ceevo-card b{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:5px;letter-spacing:.01em}
+.ceevo-card.indigo b{color:var(--accent-ink)}
+.ceevo-card.warm b{color:#9A3D22}
+.ceevo-card.coral b{color:#B8492A}
+.ceevo-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
+@media (max-width:760px){.ceevo-grid{grid-template-columns:1fr}}
+
 /* resource links */
 .links{display:flex;flex-direction:column;gap:8px}
 .links a{font-size:14px;color:var(--accent);text-decoration:none;font-family:"JetBrains Mono",monospace;border-bottom:1px solid transparent}
@@ -269,6 +305,8 @@ strong{font-weight:600;color:var(--ink)}
 
 /* demo video cards */
 .demos{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,18px)}
+.demos.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.demos.three{grid-template-columns:1fr}}
 @media(max-width:760px){.demos{grid-template-columns:1fr}}
 .demo{position:relative;display:block;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#1C1C22 center/cover no-repeat;aspect-ratio:16/9;text-decoration:none;box-shadow:var(--shadow);transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
 .demo:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
@@ -302,6 +340,19 @@ strong{font-weight:600;color:var(--ink)}
 .ladder .rung.r3 em{font-style:normal;opacity:.65;font-weight:500}
 .ladder .arr{color:var(--faint);font-size:15px}
 
+/* WSE gateway architecture diagram */
+.gw-arch-cap{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:1.1em 0 .55em}
+.gw-arch{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch}
+.gw-arch .gnode{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:5px}
+.gw-arch .gnode.accent{background:var(--accent-soft);border-color:#D9DCFB}
+.gw-arch .gnode .glbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.gw-arch .gnode.accent .glbl{color:var(--accent-ink)}
+.gw-arch .gnode h4{font-size:clamp(13px,1.2vw,15px);font-weight:600;margin:0;font-family:Inter,sans-serif}
+.gw-arch .gnode p{font-size:clamp(10.5px,1vw,12.5px);color:var(--muted);line-height:1.45;margin:0}
+.gw-arch .garr{display:flex;flex-direction:column;justify-content:center;align-items:center;color:var(--accent);font-weight:600;font-size:24px;min-width:46px;line-height:1}
+.gw-arch .garr small{display:block;font-size:9.5px;color:var(--faint);letter-spacing:.04em;text-align:center;font-weight:500;line-height:1.2;margin-top:3px;text-transform:uppercase}
+@media (max-width:760px){.gw-arch{grid-template-columns:1fr;gap:6px}.gw-arch .garr{transform:rotate(90deg);min-width:0;font-size:18px;padding:2px 0}}
+
 /* model landscape */
 .mglabel{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.55em}
 .mglabel.warm{color:var(--warm)}
@@ -318,8 +369,10 @@ strong{font-weight:600;color:var(--ink)}
 .cpt:nth-child(1){border-color:var(--accent)}
 .cpt:nth-child(2){border-color:var(--teal)}
 .cpt:nth-child(3){border-color:var(--warm)}
-.cpt:nth-child(4){border-color:#7C3AED}
-.cpt:nth-child(5){border-color:var(--gold)}
+.cpt:nth-child(4){border-color:#0891B2}
+.cpt:nth-child(5){border-color:#DB2777}
+.cpt:nth-child(6){border-color:#7C3AED}
+.cpt:nth-child(7){border-color:var(--gold)}
 
 /* persistent equation indicator (slides 3-9) */
 .eqbadge{display:flex;width:fit-content;align-items:center;gap:6px;margin-bottom:clamp(11px,1.5vw,18px);padding:4px 6px;border:1px solid var(--line);border-radius:30px;background:var(--surface);box-shadow:var(--shadow)}
@@ -404,6 +457,17 @@ strong{font-weight:600;color:var(--ink)}
         </div>
       </div>
     </div>
+    <div class="demos three" data-anim style="margin-top:1.1em">
+      <a class="demo" href="https://www.youtube.com/watch?v=zTS4pR1-r6A" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/zTS4pR1-r6A/hqdefault.jpg')">
+        <span class="play">▶</span>
+        <span class="cap"><b>Claude Code — quick start</b><span>YouTube · Matt Tanner (community) · ~5 min</span></span></a>
+      <a class="demo" href="https://www.youtube.com/watch?v=FUq9qRwrDrI" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/FUq9qRwrDrI/hqdefault.jpg')">
+        <span class="play">▶</span>
+        <span class="cap"><b>OpenAI Codex CLI — launch demo</b><span>YouTube · OpenAI · ~6 min</span></span></a>
+      <a class="demo" href="https://www.youtube.com/watch?v=1GVBRhDI5No" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/1GVBRhDI5No/hqdefault.jpg')">
+        <span class="play">▶</span>
+        <span class="cap"><b>GitHub Copilot coding agent</b><span>YouTube · GitHub Checkout · ~6 min</span></span></a>
+    </div>
     <div class="note" data-anim><span class="ic">🔁</span><p>Different UIs, <strong>same equation</strong>. Each is a model wrapped in a harness — they differ mainly in <em>which</em> tools, how much autonomy, and where they run.</p></div>
   </div>
 </section>
@@ -437,9 +501,56 @@ strong{font-weight:600;color:var(--ink)}
           <div class="cpt"><b>Reasoning / "thinking" models</b><span>spend extra compute to reason before answering — better at multi-step agent work</span></div>
           <div class="cpt"><b>Context window</b><span>how much it can read at once — the scarce resource a harness must manage</span></div>
           <div class="cpt"><b>Tool use / function calling</b><span>emits structured calls — the capability that makes agents possible at all</span></div>
+          <div class="cpt"><b>Tokens · input vs output</b><span>the unit of pricing — input (what you send) is cheap; output (what it writes) is typically 4–5× more; long context bloats the input bill</span></div>
+          <div class="cpt"><b>KV cache / prompt caching</b><span>reuse the model's prefix compute across calls — big latency &amp; cost win when system prompts &amp; tool defs stay stable (agents re-send the same prefix every turn)</span></div>
           <div class="cpt"><b>Open weight ≠ open source</b><span>you get the weights to run &amp; fine-tune; training data &amp; license still vary</span></div>
           <div class="cpt"><b>MoE &amp; tiers</b><span>Mixture-of-Experts = huge but efficient; pick flagship vs fast (Opus/Sonnet/Haiku)</span></div>
         </div>
+      </div>
+    </div>
+    <div class="spec-cap" data-anim>The OpenAI-Compatible API · one turn with tool calling <small>— the de facto wire format every code agent &amp; gateway speaks</small></div>
+    <div class="spec" data-anim>
+      <div class="spec-blk">
+        <div class="h req"><i style="background:#C4B5FD"></i><span class="v">REQUEST</span><span class="ep">POST /v1/chat/completions</span></div>
+<pre>{
+  <span class="k">"model"</span>: <span class="s">"gpt-5.5"</span>,
+  <span class="k">"messages"</span>: [
+    {<span class="k">"role"</span>:<span class="s">"system"</span>, <span class="k">"content"</span>:<span class="s">"You are a coding agent."</span>},
+    {<span class="k">"role"</span>:<span class="s">"user"</span>,   <span class="k">"content"</span>:<span class="s">"Add input validation to login()"</span>}
+  ],
+  <mark><span class="k">"tools"</span>: [{
+    <span class="k">"type"</span>: <span class="s">"function"</span>,
+    <span class="k">"function"</span>: {
+      <span class="k">"name"</span>: <span class="s">"read_file"</span>,
+      <span class="k">"description"</span>: <span class="s">"Read a file from the workspace"</span>,
+      <span class="k">"parameters"</span>: {<span class="k">"type"</span>:<span class="s">"object"</span>,
+        <span class="k">"properties"</span>:{<span class="k">"path"</span>:{<span class="k">"type"</span>:<span class="s">"string"</span>}},
+        <span class="k">"required"</span>:[<span class="s">"path"</span>]}
+    }
+  }]</mark>
+}</pre>
+      </div>
+      <div class="spec-blk">
+        <div class="h res"><i style="background:#86EFAC"></i><span class="v">RESPONSE</span><span class="ep">200 OK</span></div>
+<pre>{
+  <span class="k">"id"</span>: <span class="s">"chatcmpl-9f2b…"</span>,
+  <span class="k">"choices"</span>: [{
+    <span class="k">"message"</span>: {
+      <span class="k">"role"</span>: <span class="s">"assistant"</span>,
+      <span class="k">"content"</span>: <span class="nl">null</span>,
+      <span class="hl"><span class="k">"tool_calls"</span>: [{
+        <span class="k">"id"</span>: <span class="s">"call_abc123"</span>,
+        <span class="k">"type"</span>: <span class="s">"function"</span>,
+        <span class="k">"function"</span>: {
+          <span class="k">"name"</span>: <span class="s">"read_file"</span>,
+          <span class="k">"arguments"</span>: <span class="s">"{\"path\":\"src/auth/login.ts\"}"</span>
+        }
+      }]</span>
+    },
+    <span class="k">"finish_reason"</span>: <span class="s">"tool_calls"</span>
+  }],
+  <span class="k">"usage"</span>: {<span class="k">"prompt_tokens"</span>:<span class="n">412</span>, <span class="k">"completion_tokens"</span>:<span class="n">38</span>}
+}</pre>
       </div>
     </div>
     <div class="note" data-anim><span class="ic">🔌</span><p><strong>The model isn't everything.</strong> A good harness lifts the <em>same</em> model 5–15 pts on <span class="mono" style="font-size:.9em">SWE-bench</span> (the coding-agent benchmark) — context retrieval is often the bottleneck, not raw model IQ. <span style="color:var(--faint)">Versions move fast — verify before presenting.</span></p></div>
@@ -494,18 +605,20 @@ strong{font-weight:600;color:var(--ink)}
         <div class="note" data-anim style="margin-top:1.4em"><span class="ic">💾</span><p><strong>The filesystem is the most foundational primitive</strong> — durable state across sessions, and a natural place for human + agent to collaborate.</p></div>
       </div>
       <div>
-        <div class="loop-wrap" style="flex-direction:column;gap:18px">
-          <svg class="loop-svg" id="loopSvg" viewBox="0 0 200 200" data-anim>
+        <div class="loop-wrap" style="flex-direction:column;gap:14px">
+          <svg class="loop-svg" id="loopSvg" viewBox="-18 -18 236 236" data-anim>
             <circle cx="100" cy="100" r="74" fill="none" stroke="#E8E6E2" stroke-width="2"/>
             <circle class="loop-ring" cx="100" cy="100" r="74" fill="none" stroke="#4338CA" stroke-width="3" stroke-linecap="round" stroke-dasharray="350 116"/>
             <g font-family="Inter,sans-serif" font-weight="600" font-size="11.5" text-anchor="middle" fill="#17171B">
-              <g><circle cx="100" cy="26" r="15" fill="#EEF0FE"/><text x="100" y="30" fill="#3730A3">1</text><text x="100" y="8">Reason</text></g>
-              <g><circle cx="174" cy="100" r="15" fill="#E2F4F1"/><text x="174" y="104" fill="#0B6B64">2</text><text x="174" y="135">Act · tool call</text></g>
-              <g><circle cx="100" cy="174" r="15" fill="#FCEFE9"/><text x="100" y="178" fill="#B8492A">3</text><text x="100" y="197">Observe result</text></g>
-              <g><circle cx="26" cy="100" r="15" fill="#EFEAFB"/><text x="26" y="104" fill="#5B21B6">4</text><text x="26" y="135">Repeat ↻</text></g>
+              <g><circle cx="100" cy="26" r="15" fill="#EEF0FE"/><text x="100" y="30" fill="#3730A3">1</text><text x="100" y="4">Reason</text></g>
+              <g><circle cx="164" cy="137" r="15" fill="#E2F4F1"/><text x="164" y="141" fill="#0B6B64">2</text><text x="164" y="174">Act · tool call</text></g>
+              <g><circle cx="36" cy="137" r="15" fill="#FCEFE9"/><text x="36" y="141" fill="#B8492A">3</text><text x="36" y="174">Observe result</text></g>
             </g>
           </svg>
-          <p class="mono" data-anim style="font-size:12.5px;color:var(--muted);text-align:center">the&nbsp;<span class="ink-accent">ReAct</span>&nbsp;loop — reason → act → observe → repeat</p>
+          <div data-anim style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <p class="mono" style="font-size:12.5px;color:var(--muted);text-align:center;margin:0">the&nbsp;<span class="ink-accent">ReAct</span>&nbsp;loop — reason → act → observe ↻</p>
+            <p class="mono" style="font-size:10.5px;color:var(--faint);text-align:center;margin:0">Yao et&nbsp;al., 2022 · <a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">arXiv:2210.03629</a></p>
+          </div>
         </div>
       </div>
     </div>
@@ -608,6 +721,42 @@ strong{font-weight:600;color:var(--ink)}
   </div>
 </section>
 
+<!-- ============ 9b · CO-EVOLUTION ARC (page 9 extension) ============ -->
+<section class="slide" data-title="Co-evolution arc" data-eq="agent">
+  <div class="slide__inner">
+    <div class="kicker" data-anim>Page 9 · extension</div>
+    <h2 data-anim>The <em>AI bar</em> &amp; the <em>AI ceiling</em></h2>
+    <p class="lead" data-anim>A cheap first ask already gets you a strong answer — that's the <strong>AI bar</strong>. The remaining climb to the <strong>AI ceiling</strong> is on <strong>you</strong>: add context, turn by turn.</p>
+
+    <div class="ceevo" data-anim>
+      <svg viewBox="0 0 720 280" preserveAspectRatio="xMidYMid meet">
+        <!-- light axes -->
+        <line x1="80" y1="30" x2="80" y2="250" stroke="#E8E6E2" stroke-width="1.4"/>
+        <line x1="80" y1="250" x2="640" y2="250" stroke="#E8E6E2" stroke-width="1.4"/>
+        <text x="74" y="24" text-anchor="end" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#9A9AA2">answer quality ↑</text>
+        <text x="640" y="273" text-anchor="end" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#9A9AA2">context added →</text>
+
+        <!-- AI bar level (raised — first cheap reply is usually already quite good) -->
+        <line x1="80" y1="110" x2="640" y2="110" stroke="#6B6B73" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="645" y="114" font-family="JetBrains Mono,monospace" font-size="11" fill="#6B6B73" font-weight="700">AI bar</text>
+        <text x="645" y="125" font-family="Inter,sans-serif" font-size="9" fill="#9A9AA2" font-style="italic">first cheap reply</text>
+
+        <!-- AI ceiling level -->
+        <line x1="80" y1="55" x2="640" y2="55" stroke="#4338CA" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="645" y="59" font-family="JetBrains Mono,monospace" font-size="11" fill="#4338CA" font-weight="700">AI ceiling</text>
+
+        <!-- climbing 2-step staircase from AI bar toward AI ceiling -->
+        <polyline points="100,110 175,110 175,92 305,78 305,68 460,60 540,57 610,56"
+          fill="none" stroke="#4338CA" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- one "+ context" annotation -->
+        <text x="188" y="103" font-family="Inter,sans-serif" font-size="11" font-style="italic" fill="#4338CA">+ context</text>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
 <!-- ============ 9 · CONCEPTS: RAG + BUILD PHILOSOPHY ============ (refine with agent C) -->
 <section class="slide" data-title="RAG & two build philosophies">
   <div class="slide__inner">
@@ -651,7 +800,27 @@ strong{font-weight:600;color:var(--ink)}
       <div class="card"><h3><span class="ic" style="background:var(--warm-soft)">🖥️</span>DSAI HPC Cluster</h3>
         <p>ARCH-run GPU cluster: <strong>312 GPUs</strong> (A100 / H100 / H100-NVL / L40S), 5 PB storage, SLURM scheduling. For training &amp; large jobs. <span class="mono" style="font-size:.85em">ssh dsailogin.arch.jhu.edu</span></p></div>
     </div>
-    <div class="note" data-anim><span class="ic">🔑</span><p><strong>Getting access:</strong> Gateway → sign in with JHED at the portal &amp; mint a key. Cluster → request an account via <span class="mono">Coldfront</span>. Build agents against the Gateway; run heavy compute on the cluster.</p></div>
+    <div class="gw-arch-cap" data-anim>How a request flows through the WSE Gateway</div>
+    <div class="gw-arch" data-anim>
+      <div class="gnode">
+        <span class="glbl">You</span>
+        <h4>Your agent harness</h4>
+        <p>Claude Code · Codex · Cursor · custom Python/Node — calls an OpenAI-compatible URL with a <span class="mono" style="font-size:.92em">jhu_live_sk_</span> key</p>
+      </div>
+      <div class="garr">→<small>HTTPS</small></div>
+      <div class="gnode accent">
+        <span class="glbl">JHU · Cloudflare edge</span>
+        <h4>WSE AI Gateway</h4>
+        <p>One endpoint · key &amp; rate-limit management · centralized billing &amp; usage logs</p>
+      </div>
+      <div class="garr">→<small>provider API</small></div>
+      <div class="gnode">
+        <span class="glbl">Hosted in cloud</span>
+        <h4>Model providers</h4>
+        <p>OpenAI · Anthropic · Gemini · Grok · Workers AI — run on each vendor's own infra</p>
+      </div>
+    </div>
+    <div class="note" data-anim><span class="ic">🔑</span><p><strong>Getting access:</strong> Gateway keys are <strong>centrally provisioned</strong> — ask your project lead for a <span class="mono">jhu_live_sk_</span> key (don't self-mint).</p></div>
   </div>
 </section>
 
@@ -661,10 +830,9 @@ strong{font-weight:600;color:var(--ink)}
     <div class="kicker" data-anim>Make it practical</div>
     <h2 data-anim>How to actually start this week</h2>
     <div class="grid" style="grid-template-columns:1fr;gap:16px;max-width:860px">
-      <div class="bullet" data-anim><div class="n">1</div><div><h3>Pick one CLI agent and live in it</h3><p>Install Claude Code or Codex. Point it at a real repo. Let it read, run tests, and edit — watch the ReAct loop work.</p></div></div>
+      <div class="bullet" data-anim><div class="n">1</div><div><h3>Pick one agent and live in it</h3><p>Install Claude Code or Codex. Point it at a real repo. Let it read, run tests, and edit — watch the ReAct loop work.</p></div></div>
       <div class="bullet" data-anim><div class="n">2</div><div><h3>Spec before you prompt</h3><p>Write what you want first. Keep the <strong>Human–Spec–Code</strong> triangle tight: a one-paragraph spec beats ten vague follow-ups.</p></div></div>
-      <div class="bullet" data-anim><div class="n">3</div><div><h3>Add one MCP server &amp; one Skill</h3><p>Connect it to GitHub or your DB; write a tiny <code>SKILL.md</code> for a task you repeat. Feel the harness grow.</p></div></div>
-      <div class="bullet" data-anim><div class="n">4</div><div><h3>Route through the WSE Gateway</h3><p>Building your own agent? Use the JHU Gateway key, not a personal card. Heavy training? Submit it to the DSAI cluster.</p></div></div>
+      <div class="bullet" data-anim><div class="n">3</div><div><h3>Route through the WSE Gateway</h3><p>Building your own agent? Use the JHU Gateway key, not a personal card. Heavy training? Submit it to the DSAI cluster.</p></div></div>
     </div>
     <div class="note warm" data-anim><span class="ic">💡</span><p><strong>The meta-skill:</strong> you're no longer just writing code — you're <em>designing the harness</em> that writes it. Spec clearly, verify ruthlessly, trust but check.</p></div>
   </div>
